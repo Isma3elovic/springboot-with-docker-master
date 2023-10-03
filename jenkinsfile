@@ -1,66 +1,11 @@
-appname = "springboot-app"
- apptag = "demo"
-    
-pipeline {
-    agent any
-    options { disableConcurrentBuilds() 
-              buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))  
-                }
+node {
 
 
-
-        
- 
-         stage('Build & Upload Image') {
-
-             steps{    
-                 script {
-                    if (env.BRANCH_NAME == 'master') {
-               
-                         } else if (env.BRANCH_NAME == 'main') {
-                         docker.withRegistry( 'https://hub.docker.com/', 'isma3eel9/springboot-app' ) {
-                         docker.build("library/${appname}").push("${apptag}") }
-                         }
-                     }
-                 }
-             }
-         
+    stage("Git Clone"){
 
 
-        stage("Pull hlem chart"){
-         when {
-             
-              branch 'main'
-           }
-            steps {
+        git credentialsId: 'github',  url: 'https://github.com/Isma3elovic/springboot-with-docker-master.git'
 
-                git  branch: 'main', url: 'https://github.com/Isma3elovic/springboot-with-docker-master.git'
+    }
 
-        }   
-            
-        }
-        
-          stage('deploy to K8s') {
-             steps{    
-                 script {
-                     if (env.BRANCH_NAME == 'master') {
-             
-                     } else if (env.BRANCH_NAME == 'main') {
-                     sh ''' helm upgrade --install springboot-app -n backend ./springboot-app/ -f  ./springboot-app/k8s-spring-boot-deployment.yml  '''
-                     sh '''kubectl -n backend rollout restart deployment springboot-app'''
-                     }
-                 }
-             }
-         }
-        
-        stage ('Cleaning Up Docker Images for the next build') {
-                
-         when {
-             
-              branch 'develop'
-           }
-             steps {
-
-                     sh '''docker image prune -f'''
-             }
-        }
+}

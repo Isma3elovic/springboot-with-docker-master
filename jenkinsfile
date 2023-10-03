@@ -4,7 +4,9 @@ node {
     stage("Git Clone"){
 
 
-        git credentialsId: 'github',  url: 'https://github.com/Isma3elovic/springboot-with-docker-master.git'
+        
+        git credentialsId: 'github', url: 'https://github.com/Isma3elovic/springboot-with-docker-master.git'
+
 
     }
 
